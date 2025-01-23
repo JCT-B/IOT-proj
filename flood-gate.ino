@@ -1,48 +1,33 @@
+// Pin assignments
+const int rainSensorPin = A0; // Raindrop sensor connected to analog pin A0
+const int motorPin = 3;      // Air motor connected to digital pin 3
 
-// Define the pin numbers for the water sensor, motor, and photosensor
-int waterSensorPin = A0; //analog pin 
-int motorPin = 3;
-int photoSensorPin = A1; //analog pin
- 
-// Define the threshold values for triggering the motor action and adjusting the motor position
-int rainThreshold = 500; //change the threshold value 
-int sunThreshold = 700; //change the threshold value
- 
+// Threshold value
+const int rainThreshold = 500; // Adjust based on the sensor value for detecting water
+
 void setup() {
-  // Initialize the digital pins for the motor
+  pinMode(rainSensorPin, INPUT);
   pinMode(motorPin, OUTPUT);
-  
-  // Set up the serial communication for debugging
-  Serial.begin(9600);
+
+  digitalWrite(motorPin, LOW); // Ensure the motor is off initially
+
+  Serial.begin(9600); // For debugging
 }
- 
+
 void loop() {
-  // Read the value from the water sensor and photosensor
-  int waterSensorValue = analogRead(waterSensorPin);
-  int photoSensorValue = analogRead(photoSensorPin);
-  
-  // Print the sensor values to the serial monitor for debugging
-  Serial.print("Water Sensor Value: ");
-  Serial.print(waterSensorValue);
-  Serial.print(" | ");
-  Serial.print("Photo Sensor Value: ");
-  Serial.println(photoSensorValue);
-  
-  // Check if it's raining based on the water sensor value
-  if (waterSensorValue &lt; rainThreshold) {
-    // Trigger the motor action by setting the motor pin to high
-    digitalWrite(motorPin, HIGH);
-  } 
-  // Check if it's not raining and the sun intensity is high based on the photosensor value
-  else if (waterSensorValue &gt;= rainThreshold &amp;&amp; photoSensorValue &gt; sunThreshold) {
-    // Adjust the roof position to create shade by setting the motor pin to high
-    digitalWrite(motorPin, HIGH);
+  // Read the raindrop sensor value
+  int rainValue = analogRead(rainSensorPin);
+  Serial.print("Rain Sensor Value: ");
+  Serial.println(rainValue);
+
+  // Control the motor based on the sensor reading
+  if (rainValue < rainThreshold) {
+    digitalWrite(motorPin, HIGH); // Turn on the motor if water is detected
+    Serial.println("Water detected. Motor ON.");
+  } else {
+    digitalWrite(motorPin, LOW); // Turn off the motor if no water is detected
+    Serial.println("No water detected. Motor OFF.");
   }
-  // Stop the motor action by setting the motor pin to low
-  else {
-    digitalWrite(motorPin, LOW);
-  }
-  
-  // Wait for a short delay before repeating the loop
-  delay(1000); //depends on you, you can change it to 5 mins
+
+  delay(100); // Small delay to stabilize readings
 }
